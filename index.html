@@ -1,43 +1,67 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>FaceAttend Pro</title>
 
 <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
 
 <style>
 *{box-sizing:border-box}
-body{margin:0;font-family:Arial;background:#eef2ff;color:#172554}
-header{background:#172554;color:white;text-align:center;padding:18px}
-.container{max-width:1000px;margin:auto;padding:12px}
-.card{background:white;padding:16px;margin:14px 0;border-radius:12px;box-shadow:0 3px 12px #0001}
-input,select,button{width:100%;padding:12px;margin:7px 0;border:1px solid #cbd5e1;border-radius:7px;font-size:16px}
-button{background:#2563eb;color:white;border:0;font-weight:bold}
-.secondary{background:#475569}
-.danger{background:#dc2626}
+body{
+ margin:0;font-family:Arial,sans-serif;
+ background:#eef2ff;color:#1e293b;
+}
+header{
+ background:#1e3a8a;color:white;padding:20px;
+ text-align:center;font-size:24px;font-weight:bold;
+}
+.container{
+ max-width:900px;margin:20px auto;padding:15px;
+}
+.card{
+ background:white;padding:20px;margin-bottom:20px;
+ border-radius:12px;box-shadow:0 3px 12px #0001;
+}
+input,select,button{
+ width:100%;padding:12px;margin:8px 0;
+ border-radius:7px;border:1px solid #cbd5e1;
+ font-size:16px;
+}
+button{
+ background:#2563eb;color:white;border:none;
+ font-weight:bold;cursor:pointer;
+}
+button:hover{background:#1d4ed8}
+.menu{
+ display:flex;flex-wrap:wrap;gap:8px;margin-bottom:15px;
+}
+.menu button{flex:1;min-width:100px}
 .hidden{display:none}
-.nav{display:flex;flex-wrap:wrap;gap:8px}
-.nav button{flex:1;min-width:120px}
-.stats{display:flex;gap:10px;flex-wrap:wrap}
-.stat{flex:1;min-width:100px;background:#dbeafe;padding:15px;border-radius:8px;text-align:center}
-video{width:100%;max-width:450px;border-radius:10px;background:#111}
-table{width:100%;border-collapse:collapse;font-size:12px}
-th,td{padding:7px;border:1px solid #ddd;text-align:left}
-th{background:#e0e7ff}
-label{display:block;margin:8px 0}
-.msg{font-weight:bold;color:#166534}
+.subjects{
+ display:grid;grid-template-columns:1fr 1fr;gap:8px;
+}
+.subjects label{
+ background:#f1f5f9;padding:10px;border-radius:6px;
+}
+.subjects input{width:auto}
+video{
+ width:100%;max-width:480px;background:black;
+ border-radius:10px;display:block;margin:auto;
+}
+.status{
+ text-align:center;font-size:20px;font-weight:bold;
+ margin:15px 0;
+}
+table{width:100%;border-collapse:collapse}
+td,th{border:1px solid #cbd5e1;padding:8px;text-align:left}
 </style>
 </head>
 
 <body>
 
-<header>
-<h1>FaceAttend Pro</h1>
-<p>Smart Classroom Attendance Management System</p>
-</header>
+<header>🎓 FaceAttend Pro</header>
 
 <div class="container">
 
@@ -46,121 +70,124 @@ label{display:block;margin:8px 0}
 <h2>Admin Login</h2>
 <input id="username" placeholder="Username">
 <input id="password" type="password" placeholder="Password">
-<button onclick="login()">Login</button>
+<button onclick="loginAdmin()">Login</button>
 <p id="loginmsg"></p>
-<small>Demo Username: admin | Password: 1234</small>
 </div>
 
 <!-- DASHBOARD -->
 <div id="dashboard" class="hidden">
 
 <div class="card">
-<h2>Admin Dashboard</h2>
-<div class="nav">
-<button onclick="section('register')">Student Registration</button>
-<button onclick="section('attendance')">Face Attendance</button>
-<button onclick="section('records')">Attendance Records</button>
-<button class="secondary" onclick="logout()">Logout</button>
+<h2>Dashboard</h2>
+<div class="menu">
+<button onclick="showPage('registration')">Register Student</button>
+<button onclick="showPage('attendance')">Face Attendance</button>
+<button onclick="showPage('report')">Attendance Report</button>
+<button onclick="logout()">Logout</button>
 </div>
-<p id="modelStatus">AI Model: Not loaded</p>
-</div>
-
-<div class="stats">
-<div class="stat">Total Students<h2 id="total">0</h2></div>
-<div class="stat">Attendance Records<h2 id="count">0</h2></div>
 </div>
 
 <!-- REGISTRATION -->
-<div class="card section" id="register">
+<div class="card hidden" id="registration">
 <h2>Student Registration</h2>
 
-<input id="sname" placeholder="Student Full Name">
-<input id="roll" placeholder="Roll Number">
+<input id="studentName" placeholder="Student Name">
+<input id="studentRoll" placeholder="Roll Number">
 
-<p><b>Select Subjects</b></p>
+<h3>Select Subjects</h3>
 
-<label><input type="checkbox" class="subject" value="Java Programming"> Java Programming — Dr. A. Bharsagade Sir</label>
-<label><input type="checkbox" class="subject" value="NLP"> NLP — Dr. Gharde Sir</label>
-<label><input type="checkbox" class="subject" value="Industrial Management"> Industrial Management — Sonali Mam</label>
-<label><input type="checkbox" class="subject" value="Software Engineering"> Software Engineering — Siddhi Mam</label>
+<div class="subjects">
+<label><input type="checkbox" value="Java" class="sub"> Java</label>
+<label><input type="checkbox" value="Python" class="sub"> Python</label>
+<label><input type="checkbox" value="Web Development" class="sub"> Web Development</label>
+<label><input type="checkbox" value="DBMS" class="sub"> DBMS</label>
+<label><input type="checkbox" value="Computer Networks" class="sub"> Computer Networks</label>
+<label><input type="checkbox" value="Software Engineering" class="sub"> Software Engineering</label>
+</div>
 
-<h3>Register Face Photos</h3>
-<p>Upload 2–5 clear photos of the student's face.</p>
-<input type="file" id="facePhotos" accept="image/*" multiple>
+<h3>Upload 2–5 Student Photos</h3>
+<p>Use clear photos showing only the student's face.</p>
+<input type="file" id="studentPhotos" accept="image/*" multiple>
 
-<button onclick="registerStudent()">Register Student + Face</button>
+<button onclick="registerStudent()">Register Student</button>
 <p id="regmsg"></p>
-
-<h3>Registered Students</h3>
-<div id="studentlist"></div>
 </div>
 
 <!-- ATTENDANCE -->
-<div class="card section hidden" id="attendance">
-<h2>Face Recognition Attendance</h2>
+<div class="card hidden" id="attendance">
+<h2>Face Attendance</h2>
 
-<label>Select Student</label>
-<select id="attstudent" onchange="updateSubjects()">
+<select id="attStudent" onchange="updateSubjects()">
 <option value="">Select Student</option>
 </select>
 
-<label>Select Subject</label>
-<select id="subjectSelect">
+<select id="attSubject">
 <option value="">Select Subject</option>
 </select>
 
-<label>Attendance Type</label>
-<select id="attType">
-<option value="Entry">Entry</option>
-<option value="Exit">Exit</option>
-</select>
+<button onclick="startCamera()">📷 Start Camera & Scan</button>
+<button onclick="stopCamera()">Stop Camera</button>
 
 <video id="video" autoplay muted playsinline></video>
 
-<p id="facemsg">Press Start Camera to allow camera access.</p>
+<div class="status" id="facemsg">Camera not started</div>
 
-<button onclick="startCamera()">Start Camera</button>
-<button onclick="verifyFace()">Verify Face & Mark Attendance</button>
-<button class="danger" onclick="stopCamera()">Stop Camera</button>
+<p style="text-align:center">
+Attendance will be recorded automatically after face verification.
+</p>
 </div>
 
 <!-- REPORT -->
-<div class="card section hidden" id="records">
+<div class="card hidden" id="report">
 <h2>Attendance Report</h2>
-<input type="date" id="filterdate">
-<button onclick="displayRecords()">Show Records</button>
-<button class="secondary" onclick="downloadCSV()">Download Excel-Compatible CSV</button>
-<div id="recordlist"></div>
+
+<button onclick="showReport()">Refresh Report</button>
+<button onclick="downloadCSV()">Download CSV</button>
+
+<div style="overflow-x:auto">
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Roll</th>
+<th>Subject</th>
+<th>Date</th>
+<th>Entry</th>
+<th>Exit</th>
+</tr>
+</thead>
+<tbody id="reportbody"></tbody>
+</table>
+</div>
 </div>
 
+</div>
 </div>
 
 <script>
-let students=JSON.parse(localStorage.getItem("students")||"[]");
-let attendance=JSON.parse(localStorage.getItem("attendance")||"[]");
+const MODEL_URL =
+"https://cdn.jsdelivr.net/gh/justadudewhohacks/face-api.js@master/weights";
 
-let cameraStream=null;
-let modelsLoaded=false;
-let modelsLoading=false;
+let students = JSON.parse(localStorage.getItem("students") || "[]");
+let attendance = JSON.parse(localStorage.getItem("attendance") || "[]");
 
-const MODEL_URL="https://cdn.jsdelivr.net/gh/justadudewhohacks/face-api.js@master/weights";
-
-function saveData(){
- localStorage.setItem("students",JSON.stringify(students));
- localStorage.setItem("attendance",JSON.stringify(attendance));
-}
+let modelsLoaded = false;
+let cameraStream = null;
+let scanning = false;
+let lastMarked = "";
+let modelPromise = null;
 
 // LOGIN
-function login(){
+function loginAdmin(){
  const u=document.getElementById("username").value;
  const p=document.getElementById("password").value;
 
- if(u==="admin"&&p==="1234"){
- document.getElementById("login").classList.add("hidden");
- document.getElementById("dashboard").classList.remove("hidden");
- updateDashboard();
+ if(u==="admin" && p==="1234"){
+  document.getElementById("login").classList.add("hidden");
+  document.getElementById("dashboard").classList.remove("hidden");
+  fillStudents();
  }else{
- document.getElementById("loginmsg").innerText="Invalid username or password!";
+  document.getElementById("loginmsg").innerText="Invalid username or password";
  }
 }
 
@@ -171,397 +198,380 @@ function logout(){
 }
 
 // NAVIGATION
-function section(id){
- document.querySelectorAll(".section").forEach(x=>x.classList.add("hidden"));
- document.getElementById(id).classList.remove("hidden");
+function showPage(page){
+ stopCamera();
 
- if(id==="register")showStudents();
+ ["registration","attendance","report"].forEach(id=>{
+  document.getElementById(id).classList.add("hidden");
+ });
 
- if(id==="attendance"){
- fillStudents();
- }
+ document.getElementById(page).classList.remove("hidden");
 
- if(id==="records")displayRecords();
+ if(page==="attendance") fillStudents();
+ if(page==="report") showReport();
 }
 
-// LOAD AI MODELS IN BACKGROUND
-async function loadModels(){
- if(modelsLoaded)return true;
- if(modelsLoading){
- facemsg.innerText="AI models are loading. Please wait...";
- return false;
- }
-
- modelsLoading=true;
- document.getElementById("modelStatus").innerText="AI Models Loading...";
-
- try{
- await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL);
- await faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL);
- await faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL);
-
- modelsLoaded=true;
- document.getElementById("modelStatus").innerText="AI Models Ready";
- facemsg.innerText="AI models ready. You can verify your face.";
- return true;
-
- }catch(error){
- document.getElementById("modelStatus").innerText="AI Model Loading Failed";
- facemsg.innerText="Model load failed. Check internet and reload page.";
- return false;
-
- }finally{
- modelsLoading=false;
- }
+// SAVE
+function saveData(){
+ localStorage.setItem("students",JSON.stringify(students));
+ localStorage.setItem("attendance",JSON.stringify(attendance));
 }
 
-// STUDENT REGISTRATION
+// AI MODELS — load only once
+function loadModels(){
+ if(modelsLoaded) return Promise.resolve();
+
+ if(modelPromise) return modelPromise;
+
+ modelPromise=Promise.all([
+  faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL),
+  faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL),
+  faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL)
+ ]).then(()=>{
+  modelsLoaded=true;
+  return true;
+ }).catch(err=>{
+  modelPromise=null;
+  throw err;
+ });
+
+ return modelPromise;
+}
+
+// REGISTER STUDENT
 async function registerStudent(){
- const name=document.getElementById("sname").value.trim();
- const rollno=document.getElementById("roll").value.trim();
 
- const subjects=[...document.querySelectorAll(".subject:checked")]
+ const name=document.getElementById("studentName").value.trim();
+ const roll=document.getElementById("studentRoll").value.trim();
+ const files=document.getElementById("studentPhotos").files;
+
+ const subjects=[...document.querySelectorAll(".sub:checked")]
  .map(x=>x.value);
 
- const files=document.getElementById("facePhotos").files;
  const msg=document.getElementById("regmsg");
 
- if(!name||!rollno||subjects.length===0){
- msg.innerText="Enter name, roll number and select subjects.";
- return;
+ if(!name || !roll){
+  msg.innerText="Please enter student name and roll number.";
+  return;
  }
 
- if(students.some(s=>s.roll===rollno)){
- msg.innerText="Roll number already registered.";
- return;
+ if(subjects.length===0){
+  msg.innerText="Please select at least one subject.";
+  return;
  }
 
  if(files.length<2){
- msg.innerText="Please upload at least 2 face photos.";
- return;
+  msg.innerText="Please upload at least 2 photos.";
+  return;
  }
 
- msg.innerText="Loading AI models for face registration...";
+ if(files.length>5){
+  msg.innerText="Please upload maximum 5 photos.";
+  return;
+ }
 
- if(!await loadModels())return;
+ if(students.some(s=>s.roll===roll)){
+  msg.innerText="This roll number is already registered.";
+  return;
+ }
 
- let descriptors=[];
+ msg.innerText="Loading face recognition model...";
 
- for(let file of files){
  try{
- const img=await faceapi.bufferToImage(file);
+  await loadModels();
 
- const result=await faceapi.detectSingleFace(
- img,new faceapi.TinyFaceDetectorOptions()
- ).withFaceLandmarks().withFaceDescriptor();
+  let descriptors=[];
 
- if(result){
- descriptors.push(Array.from(result.descriptor));
- }
+  for(let file of files){
+
+   const img=await faceapi.bufferToImage(file);
+
+   const detection=await faceapi
+    .detectSingleFace(img,new faceapi.TinyFaceDetectorOptions())
+    .withFaceLandmarks()
+    .withFaceDescriptor();
+
+   if(!detection){
+    msg.innerText="Face not detected in one photo. Please use clear photos.";
+    return;
+   }
+
+   descriptors.push(Array.from(detection.descriptor));
+  }
+
+  students.push({
+   name:name,
+   roll:roll,
+   subjects:subjects,
+   descriptors:descriptors
+  });
+
+  saveData();
+  fillStudents();
+
+  msg.innerText="✅ Student registered successfully!";
+
+  document.getElementById("studentName").value="";
+  document.getElementById("studentRoll").value="";
+  document.getElementById("studentPhotos").value="";
+  document.querySelectorAll(".sub").forEach(x=>x.checked=false);
+
  }catch(e){
- console.log(e);
+  msg.innerText="Model loading failed. Check internet and try again.";
+  console.error(e);
  }
- }
-
- if(descriptors.length<2){
- msg.innerText="Face not detected in enough photos. Upload clear front-facing photos.";
- return;
- }
-
- students.push({
- name:name,
- roll:rollno,
- subjects:subjects,
- descriptors:descriptors
- });
-
- saveData();
-
- msg.innerText="Student registered successfully with face data!";
-
- document.getElementById("sname").value="";
- document.getElementById("roll").value="";
- document.getElementById("facePhotos").value="";
- document.querySelectorAll(".subject").forEach(x=>x.checked=false);
-
- showStudents();
- updateDashboard();
-}
-
-// STUDENT LIST
-function showStudents(){
- let html="<table><tr><th>Name</th><th>Roll</th><th>Subjects</th></tr>";
-
- students.forEach(s=>{
- html+=`<tr>
- <td>${escapeHTML(s.name)}</td>
- <td>${escapeHTML(s.roll)}</td>
- <td>${s.subjects.map(escapeHTML).join(", ")}</td>
- </tr>`;
- });
-
- html+="</table>";
- document.getElementById("studentlist").innerHTML=html;
 }
 
 // STUDENT DROPDOWN
 function fillStudents(){
- const select=document.getElementById("attstudent");
+
+ const select=document.getElementById("attStudent");
+
  select.innerHTML='<option value="">Select Student</option>';
 
  students.forEach((s,i)=>{
- const option=document.createElement("option");
- option.value=i;
- option.textContent=s.name+" ("+s.roll+")";
- select.appendChild(option);
+  const option=document.createElement("option");
+  option.value=i;
+  option.textContent=s.name+" ("+s.roll+")";
+  select.appendChild(option);
  });
 
  updateSubjects();
 }
 
-// SUBJECT DROPDOWN FIX
+// SUBJECT DROPDOWN
 function updateSubjects(){
- const studentIndex=document.getElementById("attstudent").value;
- const subjectSelect=document.getElementById("subjectSelect");
+
+ const studentIndex=document.getElementById("attStudent").value;
+ const subjectSelect=document.getElementById("attSubject");
 
  subjectSelect.innerHTML='<option value="">Select Subject</option>';
 
- if(studentIndex==="")return;
+ if(studentIndex==="") return;
 
  const student=students[Number(studentIndex)];
 
- if(!student||!student.subjects)return;
+ if(!student || !student.subjects) return;
 
  student.subjects.forEach(subject=>{
- const option=document.createElement("option");
- option.value=subject;
- option.textContent=subject;
- subjectSelect.appendChild(option);
+  const option=document.createElement("option");
+  option.value=subject;
+  option.textContent=subject;
+  subjectSelect.appendChild(option);
  });
 }
 
-// CAMERA FIRST, MODELS SECOND
+// CAMERA
 async function startCamera(){
- const msg=document.getElementById("facemsg");
 
- try{
- if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){
- msg.innerText="Camera unavailable. Open website using HTTPS in Chrome.";
- return;
+ const msg=document.getElementById("facemsg");
+ const video=document.getElementById("video");
+
+ const studentIndex=document.getElementById("attStudent").value;
+ const subject=document.getElementById("attSubject").value;
+
+ if(studentIndex===""){
+  msg.innerText="Please select a student.";
+  return;
  }
 
- msg.innerText="Requesting camera permission...";
+ if(!subject){
+  msg.innerText="Please select a subject.";
+  return;
+ }
 
- cameraStream=await navigator.mediaDevices.getUserMedia({
- video:{facingMode:"user"},
- audio:false
- });
+ try{
+  stopCamera();
 
- const video=document.getElementById("video");
- video.srcObject=cameraStream;
+  // Camera starts first
+  cameraStream=await navigator.mediaDevices.getUserMedia({
+   video:{facingMode:"user"},
+   audio:false
+  });
 
- await video.play();
+  video.srcObject=cameraStream;
+  await video.play();
 
- msg.innerText="Camera started! AI models are loading in background...";
+  msg.innerText="Camera started. Loading face verification...";
 
- loadModels();
+  await loadModels();
 
- }catch(error){
- msg.innerText="Camera permission denied. Allow camera access in Chrome settings.";
+  scanning=true;
+  msg.innerText="🔍 Scanning face...";
+
+  scanFace();
+
+ }catch(e){
+  msg.innerText="Camera/model error. Allow camera permission and check internet.";
+  console.error(e);
  }
 }
 
-// STOP CAMERA
 function stopCamera(){
+ scanning=false;
+
  if(cameraStream){
- cameraStream.getTracks().forEach(track=>track.stop());
- cameraStream=null;
+  cameraStream.getTracks().forEach(track=>track.stop());
+  cameraStream=null;
  }
 
- document.getElementById("video").srcObject=null;
- document.getElementById("facemsg").innerText="Camera stopped.";
+ const video=document.getElementById("video");
+ video.srcObject=null;
 }
 
-// FACE VERIFICATION
-async function verifyFace(){
- const msg=document.getElementById("facemsg");
+// FACE SCANNING
+async function scanFace(){
 
- if(!cameraStream){
- msg.innerText="Please start camera first.";
- return;
- }
+ if(!scanning) return;
 
- if(!modelsLoaded){
- msg.innerText="AI models are still loading. Please wait.";
- if(!modelsLoading)loadModels();
- return;
- }
-
- const index=document.getElementById("attstudent").value;
- const subject=document.getElementById("subjectSelect").value;
-
- if(index===""||subject===""){
- msg.innerText="Please select student and subject.";
- return;
- }
-
- const student=students[Number(index)];
-
- if(!student||!student.descriptors||student.descriptors.length===0){
- msg.innerText="Registered face data not found.";
- return;
- }
-
- msg.innerText="Scanning face... Please look at camera.";
-
- try{
  const video=document.getElementById("video");
 
- const result=await faceapi.detectSingleFace(
- video,new faceapi.TinyFaceDetectorOptions()
- ).withFaceLandmarks().withFaceDescriptor();
-
- if(!result){
- msg.innerText="Face not detected. Try better lighting.";
- return;
+ if(video.readyState<2){
+  setTimeout(scanFace,500);
+  return;
  }
 
- let bestDistance=Infinity;
+ try{
 
- student.descriptors.forEach(descriptor=>{
- const distance=faceapi.euclideanDistance(
- result.descriptor,new Float32Array(descriptor)
- );
- if(distance<bestDistance)bestDistance=distance;
- });
+  const result=await faceapi
+   .detectSingleFace(video,new faceapi.TinyFaceDetectorOptions({
+    inputSize:224,
+    scoreThreshold:0.5
+   }))
+   .withFaceLandmarks()
+   .withFaceDescriptor();
 
- if(bestDistance>0.50){
- msg.innerText="Face not matched. Try again.";
- return;
+  if(result){
+
+   const studentIndex=document.getElementById("attStudent").value;
+   const student=students[Number(studentIndex)];
+
+   if(student && student.descriptors && student.descriptors.length){
+
+    let bestDistance=1;
+
+    student.descriptors.forEach(saved=>{
+     const distance=faceapi.euclideanDistance(
+      result.descriptor,
+      new Float32Array(saved)
+     );
+
+     if(distance<bestDistance) bestDistance=distance;
+    });
+
+    // Matching threshold
+    if(bestDistance<0.48){
+
+     document.getElementById("facemsg").innerText=
+      "✅ Face Verified! Distance: "+bestDistance.toFixed(2);
+
+     markAttendance(student);
+     scanning=false;
+     return;
+    }
+   }
+  }
+
+ }catch(e){
+  console.error(e);
  }
 
- markAttendance(student,subject);
-
- }catch(error){
- msg.innerText="Face verification error. Try again.";
+ if(scanning){
+  setTimeout(scanFace,300);
  }
 }
 
-// ATTENDANCE ENTRY / EXIT
-function markAttendance(student,subject){
- const type=document.getElementById("attType").value;
- const date=new Date().toLocaleDateString();
- const time=new Date().toLocaleTimeString();
+// ATTENDANCE
+function markAttendance(student){
+
+ const subject=document.getElementById("attSubject").value;
+
+ const today=new Date().toLocaleDateString("en-IN");
+ const now=new Date().toLocaleTimeString("en-IN");
+
+ const key=student.roll+"_"+subject+"_"+today;
+
+ if(lastMarked===key){
+  document.getElementById("facemsg").innerText=
+   "Attendance already recorded for this scan.";
+  return;
+ }
+
+ lastMarked=key;
 
  let record=attendance.find(a=>
- a.roll===student.roll&&
- a.subject===subject&&
- a.date===date
+  a.roll===student.roll &&
+  a.subject===subject &&
+  a.date===today
  );
 
  if(!record){
- if(type==="Exit"){
- facemsg.innerText="Entry not found. Mark Entry first.";
- return;
- }
 
- attendance.push({
- name:student.name,
- roll:student.roll,
- subject:subject,
- date:date,
- entry:time,
- exit:"",
- status:"Incomplete"
- });
+  attendance.push({
+   name:student.name,
+   roll:student.roll,
+   subject:subject,
+   date:today,
+   entry:now,
+   exit:""
+  });
+
+  document.getElementById("facemsg").innerText=
+   "✅ Entry marked successfully!";
+
+ }else if(!record.exit){
+
+  record.exit=now;
+
+  document.getElementById("facemsg").innerText=
+   "✅ Exit marked successfully!";
 
  }else{
- if(type==="Entry"){
- facemsg.innerText="Entry already marked today.";
- return;
- }
 
- if(record.exit){
- facemsg.innerText="Exit already marked.";
- return;
- }
-
- record.exit=time;
- record.status="Complete";
+  document.getElementById("facemsg").innerText=
+   "Entry and Exit already recorded today.";
  }
 
  saveData();
- updateDashboard();
-
- document.getElementById("facemsg").innerText=
- "Face verified! "+type+" attendance marked successfully.";
 }
 
-// ATTENDANCE REPORT
-function displayRecords(){
- const selectedDate=document.getElementById("filterdate").value;
+// REPORT
+function showReport(){
 
- let html="<table><tr><th>Name</th><th>Roll</th><th>Subject</th><th>Date</th><th>Entry</th><th>Exit</th><th>Status</th></tr>";
-
- attendance.filter(a=>{
- if(!selectedDate)return true;
-
- return a.date===new Date(selectedDate+"T00:00:00").toLocaleDateString();
-
- }).forEach(a=>{
- html+=`<tr>
- <td>${escapeHTML(a.name)}</td>
- <td>${escapeHTML(a.roll)}</td>
- <td>${escapeHTML(a.subject)}</td>
- <td>${a.date}</td>
- <td>${a.entry}</td>
- <td>${a.exit||"-"}</td>
- <td>${a.status}</td>
- </tr>`;
- });
-
- html+="</table>";
-
- document.getElementById("recordlist").innerHTML=html;
-}
-
-// CSV DOWNLOAD
-function downloadCSV(){
- let csv="Name,Roll,Subject,Date,Entry,Exit,Status\n";
+ const body=document.getElementById("reportbody");
+ body.innerHTML="";
 
  attendance.forEach(a=>{
- csv+=`"${a.name}","${a.roll}","${a.subject}","${a.date}","${a.entry}","${a.exit}","${a.status}"\n`;
+  const tr=document.createElement("tr");
+
+  [a.name,a.roll,a.subject,a.date,a.entry,a.exit||"Pending"]
+  .forEach(value=>{
+   const td=document.createElement("td");
+   td.textContent=value;
+   tr.appendChild(td);
+  });
+
+  body.appendChild(tr);
+ });
+}
+
+// CSV
+function downloadCSV(){
+
+ let csv="Name,Roll,Subject,Date,Entry,Exit\n";
+
+ attendance.forEach(a=>{
+  csv+=`${a.name},${a.roll},${a.subject},${a.date},${a.entry},${a.exit}\n`;
  });
 
- const blob=new Blob(["﻿"+csv],{type:"text/csv;charset=utf-8"});
- const url=URL.createObjectURL(blob);
-
+ const blob=new Blob([csv],{type:"text/csv"});
  const link=document.createElement("a");
- link.href=url;
- link.download="FaceAttendPro_Attendance.csv";
+
+ link.href=URL.createObjectURL(blob);
+ link.download="FaceAttend_Attendance.csv";
  link.click();
-
- URL.revokeObjectURL(url);
-}
-
-// DASHBOARD STATS
-function updateDashboard(){
- document.getElementById("total").innerText=students.length;
- document.getElementById("count").innerText=attendance.length;
-}
-
-// HTML SAFETY
-function escapeHTML(str){
- return String(str).replace(/[&<>"']/g,m=>({
- "&":"&amp;",
- "<":"&lt;",
- ">":"&gt;",
- '"':"&quot;",
- "'":"&#39;"
- })[m]);
 }
 </script>
 
 </body>
- </html>
- 
+</html>
