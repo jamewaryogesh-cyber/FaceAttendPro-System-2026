@@ -1,0 +1,388 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FaceAttend Pro | Smart Attendance</title>
+
+<style>
+* {
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+body {
+  margin: 0;
+  background: #f1f5f9;
+  color: #1e293b;
+}
+
+header {
+  background: #142b4a;
+  color: white;
+  padding: 20px;
+  text-align: center;
+}
+
+header h1 {
+  margin: 0;
+}
+
+header p {
+  color: #cbd5e1;
+}
+
+.container {
+  max-width: 900px;
+  margin: auto;
+  padding: 20px;
+}
+
+.card {
+  background: white;
+  padding: 20px;
+  margin-bottom: 20px;
+  border-radius: 14px;
+  box-shadow: 0 4px 12px #00000010;
+}
+
+input, select {
+  width: 100%;
+  padding: 12px;
+  margin: 8px 0 15px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 16px;
+}
+
+button {
+  background: #2563eb;
+  color: white;
+  border: none;
+  padding: 12px 18px;
+  margin: 5px 0;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #1d4ed8;
+}
+
+.logout {
+  background: #dc2626;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+}
+
+.stat {
+  background: #dbeafe;
+  padding: 20px;
+  text-align: center;
+  border-radius: 10px;
+}
+
+.stat h2 {
+  color: #2563eb;
+}
+
+#dashboard {
+  display: none;
+}
+
+.message {
+  color: #dc2626;
+}
+
+.student {
+  padding: 12px;
+  border-bottom: 1px solid #ddd;
+}
+
+footer {
+  text-align: center;
+  padding: 20px;
+  color: #64748b;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>📸 FaceAttend Pro</h1>
+  <p>Smart Classroom Attendance Management System</p>
+</header>
+
+<div class="container">
+
+  <div class="card" id="login">
+    <h2>🔐 Admin Login</h2>
+
+    <label>Username</label>
+    <input id="username" placeholder="Enter username">
+
+    <label>Password</label>
+    <input id="password" type="password" placeholder="Enter password">
+
+    <button onclick="login()">Login</button>
+    <p id="loginMessage" class="message"></p>
+  </div>
+
+  <div id="dashboard">
+
+    <div class="card">
+      <h2>Welcome, Admin! 👋</h2>
+      <p>Manage classroom attendance.</p>
+      <button class="logout" onclick="logout()">Logout</button>
+    </div>
+
+    <div class="stats">
+      <div class="stat">
+        <h2 id="totalStudents">0</h2>
+        <p>Total Students</p>
+      </div>
+
+      <div class="stat">
+        <h2 id="totalAttendance">0</h2>
+        <p>Today's Attendance</p>
+      </div>
+
+      <div class="stat">
+        <h2 id="date"></h2>
+        <p>Date</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>🧑‍🎓 Register Student</h2>
+
+      <label>Student Name</label>
+      <input id="studentName" placeholder="Enter student name">
+
+      <label>Roll Number</label>
+      <input id="roll" placeholder="Enter roll number">
+
+      <label>Subject</label>
+      <select id="subject">
+        <option value="">Select subject</option>
+        <option>Java Programming</option>
+        <option>Python Programming</option>
+        <option>Web Development</option>
+        <option>Database Management System</option>
+        <option>Computer Networks</option>
+        <option>Software Engineering</option>
+      </select>
+
+      <button onclick="registerStudent()">Register Student</button>
+    </div>
+
+    <div class="card">
+      <h2>📋 Student List</h2>
+      <div id="studentList">No students registered.</div>
+    </div>
+
+    <div class="card">
+      <h2>📅 Attendance Session</h2>
+
+      <label>Subject</label>
+      <select id="attendanceSubject">
+        <option>Java Programming</option>
+        <option>Python Programming</option>
+        <option>Web Development</option>
+        <option>Computer Networks</option>
+      </select>
+
+      <button onclick="markAttendance()">Mark Demo Attendance</button>
+      <button onclick="exportCSV()">Download Attendance CSV</button>
+
+      <div id="attendanceList"></div>
+    </div>
+
+  </div>
+</div>
+
+<footer>
+FaceAttend Pro © 2026 | Academic Project
+</footer>
+
+<script>
+const ADMIN_USERNAME = "admin";
+const ADMIN_PASSWORD = "1234";
+
+let students = JSON.parse(localStorage.getItem("students")) || [];
+let attendance = JSON.parse(localStorage.getItem("attendance")) || [];
+
+document.getElementById("date").innerText =
+  new Date().toLocaleDateString();
+
+function login() {
+  const u = document.getElementById("username").value;
+  const p = document.getElementById("password").value;
+
+  if (u === ADMIN_USERNAME && p === ADMIN_PASSWORD) {
+    sessionStorage.setItem("loggedIn", "true");
+    showDashboard();
+  } else {
+    document.getElementById("loginMessage").innerText =
+      "Incorrect username or password!";
+  }
+}
+
+function showDashboard() {
+  document.getElementById("login").style.display = "none";
+  document.getElementById("dashboard").style.display = "block";
+  updateStudents();
+}
+
+function logout() {
+  sessionStorage.removeItem("loggedIn");
+  document.getElementById("dashboard").style.display = "none";
+  document.getElementById("login").style.display = "block";
+}
+
+function registerStudent() {
+  const name = document.getElementById("studentName").value.trim();
+  const roll = document.getElementById("roll").value.trim();
+  const subject = document.getElementById("subject").value;
+
+  if (!name || !roll || !subject) {
+    alert("Please fill all details!");
+    return;
+  }
+
+  if (students.some(s => s.roll === roll)) {
+    alert("Roll number already registered!");
+    return;
+  }
+
+  students.push({ name, roll, subject });
+
+  localStorage.setItem("students", JSON.stringify(students));
+
+  document.getElementById("studentName").value = "";
+  document.getElementById("roll").value = "";
+
+  updateStudents();
+  alert("Student registered successfully!");
+}
+
+function updateStudents() {
+  document.getElementById("totalStudents").innerText = students.length;
+
+  const list = document.getElementById("studentList");
+
+  if (students.length === 0) {
+    list.innerHTML = "No students registered.";
+    return;
+  }
+
+  list.innerHTML = students.map(s => `
+    <div class="student">
+      <b>${escapeHTML(s.name)}</b><br>
+      Roll: ${escapeHTML(s.roll)}<br>
+      Subject: ${escapeHTML(s.subject)}
+    </div>
+  `).join("");
+}
+
+function markAttendance() {
+  const subject = document.getElementById("attendanceSubject").value;
+  const today = new Date().toLocaleDateString();
+
+  const eligible = students.filter(s => s.subject === subject);
+
+  if (eligible.length === 0) {
+    alert("Please register students for this subject first!");
+    return;
+  }
+
+  eligible.forEach(s => {
+    const exists = attendance.some(a =>
+      a.roll === s.roll &&
+      a.subject === subject &&
+      a.date === today
+    );
+
+    if (!exists) {
+      attendance.push({
+        name: s.name,
+        roll: s.roll,
+        subject: subject,
+        date: today,
+        time: new Date().toLocaleTimeString(),
+        status: "Present (Demo)"
+      });
+    }
+  });
+
+  localStorage.setItem("attendance", JSON.stringify(attendance));
+
+  document.getElementById("totalAttendance").innerText =
+    attendance.filter(a => a.date === today).length;
+
+  showAttendance();
+  alert("Demo attendance marked!");
+}
+
+function showAttendance() {
+  const today = new Date().toLocaleDateString();
+
+  const records = attendance.filter(a => a.date === today);
+
+  document.getElementById("attendanceList").innerHTML =
+    records.map(a => `
+      <div class="student">
+        ${escapeHTML(a.name)} (${escapeHTML(a.roll)})<br>
+        ${escapeHTML(a.subject)} | ${escapeHTML(a.time)}<br>
+        Status: ${escapeHTML(a.status)}
+      </div>
+    `).join("");
+}
+
+function exportCSV() {
+  if (attendance.length === 0) {
+    alert("No attendance records available!");
+    return;
+  }
+
+  let csv = "Name,Roll Number,Subject,Date,Time,Status\n";
+
+  attendance.forEach(a => {
+    csv += `"${a.name}","${a.roll}","${a.subject}","${a.date}","${a.time}","${a.status}"\n`;
+  });
+
+  const blob = new Blob([csv], {
+    type: "text/csv;charset=utf-8;"
+  });
+
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = "FaceAttendPro_Attendance.csv";
+  link.click();
+}
+
+function escapeHTML(value) {
+  return String(value).replace(/[&<>"']/g, c => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;"
+  })[c]);
+}
+
+if (sessionStorage.getItem("loggedIn") === "true") {
+  showDashboard();
+}
+</script>
+
+</body>
+  </html>
+  
