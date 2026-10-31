@@ -4,385 +4,415 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FaceAttend Pro | Smart Attendance</title>
+<title>FaceAttend Pro</title>
+
+<script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
 
 <style>
-* {
-  box-sizing: border-box;
-  font-family: Arial, sans-serif;
-}
-
-body {
-  margin: 0;
-  background: #f1f5f9;
-  color: #1e293b;
-}
-
-header {
-  background: #142b4a;
-  color: white;
-  padding: 20px;
-  text-align: center;
-}
-
-header h1 {
-  margin: 0;
-}
-
-header p {
-  color: #cbd5e1;
-}
-
-.container {
-  max-width: 900px;
-  margin: auto;
-  padding: 20px;
-}
-
-.card {
-  background: white;
-  padding: 20px;
-  margin-bottom: 20px;
-  border-radius: 14px;
-  box-shadow: 0 4px 12px #00000010;
-}
-
-input, select {
-  width: 100%;
-  padding: 12px;
-  margin: 8px 0 15px;
-  border: 1px solid #cbd5e1;
-  border-radius: 8px;
-  font-size: 16px;
-}
-
-button {
-  background: #2563eb;
-  color: white;
-  border: none;
-  padding: 12px 18px;
-  margin: 5px 0;
-  border-radius: 8px;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-button:hover {
-  background: #1d4ed8;
-}
-
-.logout {
-  background: #dc2626;
-}
-
-.stats {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: 12px;
-}
-
-.stat {
-  background: #dbeafe;
-  padding: 20px;
-  text-align: center;
-  border-radius: 10px;
-}
-
-.stat h2 {
-  color: #2563eb;
-}
-
-#dashboard {
-  display: none;
-}
-
-.message {
-  color: #dc2626;
-}
-
-.student {
-  padding: 12px;
-  border-bottom: 1px solid #ddd;
-}
-
-footer {
-  text-align: center;
-  padding: 20px;
-  color: #64748b;
-}
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial;background:#eef2ff;color:#172554}
+header{background:#172554;color:white;text-align:center;padding:20px}
+.container{max-width:1000px;margin:auto;padding:12px}
+.card{background:white;padding:18px;margin:14px 0;border-radius:12px;box-shadow:0 3px 12px #0001}
+input,select,button{width:100%;padding:12px;margin:7px 0;border:1px solid #cbd5e1;border-radius:7px;font-size:16px}
+button{background:#2563eb;color:white;border:0;font-weight:bold}
+.secondary{background:#475569}
+.danger{background:#dc2626}
+.hidden{display:none}
+.nav{display:flex;flex-wrap:wrap;gap:8px}
+.nav button{flex:1;min-width:120px}
+.stats{display:flex;gap:10px;flex-wrap:wrap}
+.stat{flex:1;min-width:100px;background:#dbeafe;padding:15px;border-radius:8px;text-align:center}
+video{width:100%;max-width:450px;border-radius:10px;background:#111}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{padding:8px;border:1px solid #ddd;text-align:left}
+th{background:#e0e7ff}
+small{color:#64748b}
+.msg{font-weight:bold;color:#166534}
 </style>
 </head>
 
 <body>
 
 <header>
-  <h1>📸 FaceAttend Pro</h1>
-  <p>Smart Classroom Attendance Management System</p>
+<h1>FaceAttend Pro</h1>
+<p>Smart Classroom Attendance Management System</p>
 </header>
 
 <div class="container">
 
-  <div class="card" id="login">
-    <h2>🔐 Admin Login</h2>
-
-    <label>Username</label>
-    <input id="username" placeholder="Enter username">
-
-    <label>Password</label>
-    <input id="password" type="password" placeholder="Enter password">
-
-    <button onclick="login()">Login</button>
-    <p id="loginMessage" class="message"></p>
-  </div>
-
-  <div id="dashboard">
-
-    <div class="card">
-      <h2>Welcome, Admin! 👋</h2>
-      <p>Manage classroom attendance.</p>
-      <button class="logout" onclick="logout()">Logout</button>
-    </div>
-
-    <div class="stats">
-      <div class="stat">
-        <h2 id="totalStudents">0</h2>
-        <p>Total Students</p>
-      </div>
-
-      <div class="stat">
-        <h2 id="totalAttendance">0</h2>
-        <p>Today's Attendance</p>
-      </div>
-
-      <div class="stat">
-        <h2 id="date"></h2>
-        <p>Date</p>
-      </div>
-    </div>
-
-    <div class="card">
-      <h2>🧑‍🎓 Register Student</h2>
-
-      <label>Student Name</label>
-      <input id="studentName" placeholder="Enter student name">
-
-      <label>Roll Number</label>
-      <input id="roll" placeholder="Enter roll number">
-
-      <label>Subject</label>
-      <select id="subject">
-        <option value="">Select subject</option>
-        <option>Java Programming</option>
-        <option>Python Programming</option>
-        <option>Web Development</option>
-        <option>Database Management System</option>
-        <option>Computer Networks</option>
-        <option>Software Engineering</option>
-      </select>
-
-      <button onclick="registerStudent()">Register Student</button>
-    </div>
-
-    <div class="card">
-      <h2>📋 Student List</h2>
-      <div id="studentList">No students registered.</div>
-    </div>
-
-    <div class="card">
-      <h2>📅 Attendance Session</h2>
-
-      <label>Subject</label>
-      <select id="attendanceSubject">
-        <option>Java Programming</option>
-        <option>Python Programming</option>
-        <option>Web Development</option>
-        <option>Computer Networks</option>
-      </select>
-
-      <button onclick="markAttendance()">Mark Demo Attendance</button>
-      <button onclick="exportCSV()">Download Attendance CSV</button>
-
-      <div id="attendanceList"></div>
-    </div>
-
-  </div>
+<div class="card" id="login">
+<h2>Admin Login</h2>
+<input id="username" placeholder="Username">
+<input id="password" type="password" placeholder="Password">
+<button onclick="login()">Login</button>
+<p id="loginmsg"></p>
+<small>Demo Login: admin | Password: 1234</small>
 </div>
 
-<footer>
-FaceAttend Pro © 2026 | Academic Project
-</footer>
+<div id="dashboard" class="hidden">
+
+<div class="card">
+<h2>Admin Dashboard</h2>
+<div class="nav">
+<button onclick="section('register')">Student Registration</button>
+<button onclick="section('attendance')">Face Attendance</button>
+<button onclick="section('records')">Attendance Records</button>
+<button class="secondary" onclick="logout()">Logout</button>
+</div>
+<p id="modelStatus">AI Model: Not loaded</p>
+</div>
+
+<div class="stats">
+<div class="stat">Students<h2 id="total">0</h2></div>
+<div class="stat">Attendance Records<h2 id="count">0</h2></div>
+</div>
+
+<!-- REGISTRATION -->
+<div class="card section" id="register">
+<h2>Student Registration</h2>
+
+<input id="sname" placeholder="Student Full Name">
+<input id="roll" placeholder="Roll Number">
+
+<p><b>Select Subjects</b></p>
+<label><input type="checkbox" class="subject" value="Java Programming"> Java Programming — Dr. A. Bharsagade Sir</label><br>
+<label><input type="checkbox" class="subject" value="NLP"> NLP — Dr. Gharde Sir</label><br>
+<label><input type="checkbox" class="subject" value="Industrial Management"> Industrial Management — Sonali Mam</label><br>
+<label><input type="checkbox" class="subject" value="Software Engineering"> Software Engineering — Siddhi Mam</label>
+
+<h3>Register Face Photos</h3>
+<p>Upload 2–5 clear photos of the student face.</p>
+<input type="file" id="facePhotos" accept="image/*" multiple>
+<button onclick="registerStudent()">Register Student + Face</button>
+<p id="regmsg"></p>
+
+<h3>Registered Students</h3>
+<div id="studentlist"></div>
+</div>
+
+<!-- FACE ATTENDANCE -->
+<div class="card section hidden" id="attendance">
+<h2>Face Recognition Attendance</h2>
+
+<select id="attstudent"></select>
+<select id="subjectSelect"></select>
+
+<p><b>Attendance Type</b></p>
+<select id="attType">
+<option value="Entry">Entry</option>
+<option value="Exit">Exit</option>
+</select>
+
+<video id="video" autoplay muted playsinline></video>
+<p id="facemsg">Camera is not started.</p>
+
+<button onclick="startCamera()">Start Camera</button>
+<button onclick="verifyFace()">Verify Face & Mark Attendance</button>
+<button class="danger" onclick="stopCamera()">Stop Camera</button>
+</div>
+
+<!-- REPORT -->
+<div class="card section hidden" id="records">
+<h2>Attendance Report</h2>
+<input type="date" id="filterdate">
+<button onclick="displayRecords()">Show Records</button>
+<button class="secondary" onclick="downloadCSV()">Download CSV / Excel</button>
+<div id="recordlist"></div>
+</div>
+
+</div>
 
 <script>
-const ADMIN_USERNAME = "admin";
-const ADMIN_PASSWORD = "1234";
+let students=JSON.parse(localStorage.getItem("students")||"[]");
+let attendance=JSON.parse(localStorage.getItem("attendance")||"[]");
+let cameraStream=null;
+let modelsLoaded=false;
 
-let students = JSON.parse(localStorage.getItem("students")) || [];
-let attendance = JSON.parse(localStorage.getItem("attendance")) || [];
+const MODEL_URL="https://cdn.jsdelivr.net/gh/justadudewhohacks/face-api.js@master/weights";
 
-document.getElementById("date").innerText =
-  new Date().toLocaleDateString();
-
-function login() {
-  const u = document.getElementById("username").value;
-  const p = document.getElementById("password").value;
-
-  if (u === ADMIN_USERNAME && p === ADMIN_PASSWORD) {
-    sessionStorage.setItem("loggedIn", "true");
-    showDashboard();
-  } else {
-    document.getElementById("loginMessage").innerText =
-      "Incorrect username or password!";
-  }
+async function loadModels(){
+ if(modelsLoaded)return true;
+ document.getElementById("modelStatus").innerText="Loading AI models...";
+ try{
+ await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL);
+ await faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL);
+ await faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL);
+ modelsLoaded=true;
+ document.getElementById("modelStatus").innerText="AI Models Loaded Successfully";
+ return true;
+ }catch(e){
+ document.getElementById("modelStatus").innerText="Model loading failed. Check internet.";
+ return false;
+ }
 }
 
-function showDashboard() {
-  document.getElementById("login").style.display = "none";
-  document.getElementById("dashboard").style.display = "block";
-  updateStudents();
+function saveData(){
+ localStorage.setItem("students",JSON.stringify(students));
+ localStorage.setItem("attendance",JSON.stringify(attendance));
 }
 
-function logout() {
-  sessionStorage.removeItem("loggedIn");
-  document.getElementById("dashboard").style.display = "none";
-  document.getElementById("login").style.display = "block";
+function login(){
+ if(username.value==="admin"&&password.value==="1234"){
+ document.getElementById("login").classList.add("hidden");
+ document.getElementById("dashboard").classList.remove("hidden");
+ updateDashboard();
+ loadModels();
+ }else loginmsg.innerText="Invalid username or password";
 }
 
-function registerStudent() {
-  const name = document.getElementById("studentName").value.trim();
-  const roll = document.getElementById("roll").value.trim();
-  const subject = document.getElementById("subject").value;
-
-  if (!name || !roll || !subject) {
-    alert("Please fill all details!");
-    return;
-  }
-
-  if (students.some(s => s.roll === roll)) {
-    alert("Roll number already registered!");
-    return;
-  }
-
-  students.push({ name, roll, subject });
-
-  localStorage.setItem("students", JSON.stringify(students));
-
-  document.getElementById("studentName").value = "";
-  document.getElementById("roll").value = "";
-
-  updateStudents();
-  alert("Student registered successfully!");
+function logout(){
+ stopCamera();
+ dashboard.classList.add("hidden");
+ document.getElementById("login").classList.remove("hidden");
 }
 
-function updateStudents() {
-  document.getElementById("totalStudents").innerText = students.length;
-
-  const list = document.getElementById("studentList");
-
-  if (students.length === 0) {
-    list.innerHTML = "No students registered.";
-    return;
-  }
-
-  list.innerHTML = students.map(s => `
-    <div class="student">
-      <b>${escapeHTML(s.name)}</b><br>
-      Roll: ${escapeHTML(s.roll)}<br>
-      Subject: ${escapeHTML(s.subject)}
-    </div>
-  `).join("");
+function section(id){
+ document.querySelectorAll(".section").forEach(x=>x.classList.add("hidden"));
+ document.getElementById(id).classList.remove("hidden");
+ if(id==="register")showStudents();
+ if(id==="attendance"){
+ fillStudents();
+ loadModels();
+ }
+ if(id==="records")displayRecords();
 }
 
-function markAttendance() {
-  const subject = document.getElementById("attendanceSubject").value;
-  const today = new Date().toLocaleDateString();
+async function registerStudent(){
+ let name=sname.value.trim();
+ let rollno=roll.value.trim();
+ let subjects=[...document.querySelectorAll(".subject:checked")].map(x=>x.value);
+ let files=facePhotos.files;
 
-  const eligible = students.filter(s => s.subject === subject);
+ if(!name||!rollno||subjects.length===0){
+ regmsg.innerText="Enter name, roll number and select subjects.";
+ return;
+ }
 
-  if (eligible.length === 0) {
-    alert("Please register students for this subject first!");
-    return;
-  }
+ if(students.some(s=>s.roll===rollno)){
+ regmsg.innerText="Roll number already registered.";
+ return;
+ }
 
-  eligible.forEach(s => {
-    const exists = attendance.some(a =>
-      a.roll === s.roll &&
-      a.subject === subject &&
-      a.date === today
-    );
+ if(files.length<2){
+ regmsg.innerText="Please upload at least 2 face photos.";
+ return;
+ }
 
-    if (!exists) {
-      attendance.push({
-        name: s.name,
-        roll: s.roll,
-        subject: subject,
-        date: today,
-        time: new Date().toLocaleTimeString(),
-        status: "Present (Demo)"
-      });
-    }
-  });
+ if(!await loadModels())return;
 
-  localStorage.setItem("attendance", JSON.stringify(attendance));
+ regmsg.innerText="Processing face photos...";
 
-  document.getElementById("totalAttendance").innerText =
-    attendance.filter(a => a.date === today).length;
+ let descriptors=[];
 
-  showAttendance();
-  alert("Demo attendance marked!");
+ for(let file of files){
+ try{
+ let img=await faceapi.bufferToImage(file);
+ let result=await faceapi.detectSingleFace(img,new faceapi.TinyFaceDetectorOptions())
+ .withFaceLandmarks().withFaceDescriptor();
+
+ if(result)descriptors.push(Array.from(result.descriptor));
+ }catch(e){}
+ }
+
+ if(descriptors.length<2){
+ regmsg.innerText="Face not detected in enough photos. Use clear front-facing photos.";
+ return;
+ }
+
+ students.push({
+ name:name,
+ roll:rollno,
+ subjects:subjects,
+ descriptors:descriptors
+ });
+
+ saveData();
+ regmsg.innerText="Student registered with face successfully!";
+ sname.value="";
+ roll.value="";
+ facePhotos.value="";
+ document.querySelectorAll(".subject").forEach(x=>x.checked=false);
+ showStudents();
+ updateDashboard();
 }
 
-function showAttendance() {
-  const today = new Date().toLocaleDateString();
-
-  const records = attendance.filter(a => a.date === today);
-
-  document.getElementById("attendanceList").innerHTML =
-    records.map(a => `
-      <div class="student">
-        ${escapeHTML(a.name)} (${escapeHTML(a.roll)})<br>
-        ${escapeHTML(a.subject)} | ${escapeHTML(a.time)}<br>
-        Status: ${escapeHTML(a.status)}
-      </div>
-    `).join("");
+function showStudents(){
+ let html="<table><tr><th>Name</th><th>Roll</th><th>Subjects</th><th>Face Photos</th></tr>";
+ students.forEach(s=>{
+ html+=`<tr><td>${escapeHTML(s.name)}</td><td>${escapeHTML(s.roll)}</td><td>${s.subjects.join(", ")}</td><td>${s.descriptors?.length||0}</td></tr>`;
+ });
+ html+="</table>";
+ studentlist.innerHTML=html;
 }
 
-function exportCSV() {
-  if (attendance.length === 0) {
-    alert("No attendance records available!");
-    return;
-  }
-
-  let csv = "Name,Roll Number,Subject,Date,Time,Status\n";
-
-  attendance.forEach(a => {
-    csv += `"${a.name}","${a.roll}","${a.subject}","${a.date}","${a.time}","${a.status}"\n`;
-  });
-
-  const blob = new Blob([csv], {
-    type: "text/csv;charset=utf-8;"
-  });
-
-  const link = document.createElement("a");
-  link.href = URL.createObjectURL(blob);
-  link.download = "FaceAttendPro_Attendance.csv";
-  link.click();
+function fillStudents(){
+ attstudent.innerHTML="";
+ students.forEach((s,i)=>{
+ attstudent.innerHTML+=`<option value="${i}">${escapeHTML(s.name)} (${escapeHTML(s.roll)})</option>`;
+ });
+ updateSubjects();
 }
 
-function escapeHTML(value) {
-  return String(value).replace(/[&<>"']/g, c => ({
-    "&": "&amp;",
-    "<": "&lt;",
-    ">": "&gt;",
-    '"': "&quot;",
-    "'": "&#39;"
-  })[c]);
+function updateSubjects(){
+ let index=attstudent.value;
+ subjectSelect.innerHTML="";
+ if(index==="")return;
+ let s=students[index];
+ s.subjects.forEach(sub=>{
+ subjectSelect.innerHTML+=`<option value="${escapeHTML(sub)}">${escapeHTML(sub)}</option>`;
+ });
 }
 
-if (sessionStorage.getItem("loggedIn") === "true") {
-  showDashboard();
+attstudent.addEventListener("change",updateSubjects);
+
+async function startCamera(){
+ if(!await loadModels())return;
+ try{
+ cameraStream=await navigator.mediaDevices.getUserMedia({
+ video:{facingMode:"user"},audio:false
+ });
+ video.srcObject=cameraStream;
+ facemsg.innerText="Camera started. Look directly at the camera.";
+ }catch(e){
+ facemsg.innerText="Camera permission denied or camera unavailable.";
+ }
+}
+
+function stopCamera(){
+ if(cameraStream){
+ cameraStream.getTracks().forEach(t=>t.stop());
+ cameraStream=null;
+ }
+ video.srcObject=null;
+ facemsg.innerText="Camera stopped.";
+}
+
+async function verifyFace(){
+ if(!cameraStream){
+ facemsg.innerText="Please start camera first.";
+ return;
+ }
+
+ if(!await loadModels())return;
+
+ let index=attstudent.value;
+ if(index===""){
+ facemsg.innerText="Register a student first.";
+ return;
+ }
+
+ let student=students[index];
+
+ if(!student.descriptors||student.descriptors.length===0){
+ facemsg.innerText="Student face data not found.";
+ return;
+ }
+
+ facemsg.innerText="Scanning face...";
+
+ let detected=await faceapi.detectSingleFace(
+ video,new faceapi.TinyFaceDetectorOptions()
+ ).withFaceLandmarks().withFaceDescriptor();
+
+ if(!detected){
+ facemsg.innerText="Face not detected. Keep face visible and try again.";
+ return;
+ }
+
+ let bestDistance=1;
+
+ student.descriptors.forEach(d=>{
+ let distance=faceapi.euclideanDistance(
+ detected.descriptor,new Float32Array(d)
+ );
+ if(distance<bestDistance)bestDistance=distance;
+ });
+
+ if(bestDistance>0.50){
+ facemsg.innerText="Face did not match. Try again.";
+ return;
+ }
+
+ markVerified(student);
+}
+
+function markVerified(student){
+ let subject=subjectSelect.value;
+ let type=attType.value;
+ let date=new Date().toLocaleDateString();
+ let time=new Date().toLocaleTimeString();
+
+ let record=attendance.find(a=>
+ a.roll===student.roll&&a.subject===subject&&a.date===date
+ );
+
+ if(!record){
+ if(type==="Exit"){
+ facemsg.innerText="No Entry record found. Mark Entry first.";
+ return;
+ }
+ attendance.push({
+ name:student.name,roll:student.roll,subject,date,
+ entry:time,exit:"",status:"Incomplete"
+ });
+ }else{
+ if(type==="Entry"){
+ facemsg.innerText="Entry is already marked.";
+ return;
+ }
+ if(record.exit){
+ facemsg.innerText="Exit already marked.";
+ return;
+ }
+ record.exit=time;
+ record.status="Complete";
+ }
+
+ saveData();
+ updateDashboard();
+ facemsg.innerText="Face verified! "+type+" attendance marked successfully.";
+}
+
+function displayRecords(){
+ let selectedDate=filterdate.value;
+ let html="<table><tr><th>Name</th><th>Roll</th><th>Subject</th><th>Date</th><th>Entry</th><th>Exit</th><th>Status</th></tr>";
+
+ attendance.filter(a=>{
+ if(!selectedDate)return true;
+ let d=new Date(a.date).toLocaleDateString();
+ return d===new Date(selectedDate+"T00:00:00").toLocaleDateString();
+ }).forEach(a=>{
+ html+=`<tr><td>${escapeHTML(a.name)}</td><td>${escapeHTML(a.roll)}</td><td>${escapeHTML(a.subject)}</td><td>${a.date}</td><td>${a.entry}</td><td>${a.exit||"-"}</td><td>${a.status}</td></tr>`;
+ });
+ html+="</table>";
+ recordlist.innerHTML=html;
+}
+
+function downloadCSV(){
+ let csv="Name,Roll,Subject,Date,Entry,Exit,Status\n";
+ attendance.forEach(a=>{
+ csv+=`"${a.name}","${a.roll}","${a.subject}","${a.date}","${a.entry}","${a.exit}","${a.status}"\n`;
+ });
+ let blob=new Blob(["\ufeff"+csv],{type:"text/csv;charset=utf-8"});
+ let url=URL.createObjectURL(blob);
+ let link=document.createElement("a");
+ link.href=url;
+ link.download="FaceAttendPro_Attendance.csv";
+ link.click();
+ URL.revokeObjectURL(url);
+}
+
+function updateDashboard(){
+ total.innerText=students.length;
+ count.innerText=attendance.length;
+}
+
+function escapeHTML(str){
+ return String(str).replace(/[&<>"']/g,m=>({
+ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+ })[m]);
 }
 </script>
-
 </body>
-  </html>
-  
+</html>
